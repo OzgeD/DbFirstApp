@@ -1,6 +1,8 @@
-﻿using System;
+﻿using ConsoleTables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,58 +13,41 @@ namespace DbFirstApp
         static void Main(string[] args)
         {
             NORTHWNDEntities db = new NORTHWNDEntities();
-            ////CRUD
-            ////Create
-            //var category = new Category();
-            //category.CategoryName = "Çerezler";
-            //category.Description = "Fındık,Fıstık,Ceviz...";
+            var result = (from p in db.Products
+                         join c in db.Categories
+                         on p.CategoryID equals c.CategoryID
+                         group new { c,p } by new { c.CategoryName } into g
+                         select new
+                         {
+                             g.Key.CategoryName,
+                             NumberOfProducts=g.Count(),
+                             TotalPrice = g.Sum(x=>x.p.UnitPrice),
+                             MaxPrice = g.Max(x=>x.p.UnitPrice),
+                             MinPrice = g.Min(x => x.p.UnitPrice)
+                         }).Where(x=>x.TotalPrice>300);
 
-            //db.Categories.Add(category);
-            //db.SaveChanges();
-            //Console.ReadLine();
+            //var result = from p in db.Products
+            //             group p by p.CategoryID into g
+            //             select new
+            //             {
+            //                 g.Key,
+            //                 NumberOfProducts = g.Count()
+            //             };
 
-            ////Read
-            //var categories = db.Categories;
-            //foreach(var cat in categories)
-            //{
-            //    Console.WriteLine(cat.CategoryName + "/" + cat.Description);
-            //}
-            //Console.ReadLine();
+            //var result = from c in db.Categories
+            //             join p in db.Products
+            //             on c.CategoryID equals p.ProductID
+            //             orderby p.UnitPrice descending
+            //             select new
+            //             {
+            //                 p.ProductName,
+            //                 c.CategoryName,
+            //                 p.UnitPrice
+            //             };
 
-            ////Update
-            //var category = db.Categories.Find(10);
-            //category.CategoryName = "İçecekler";
-            //category.Description = "Su,Kola,Meyve suyu...";
-            //db.SaveChanges();
-            //Console.ReadLine();
 
-            //Delete
-            var category = db.Categories.Find(10);
-            db.Categories.Remove(category);
-            db.SaveChanges();
+            ConsoleTable.From(result).Write();
             Console.ReadLine();
-
-            ///Modele stored procedure dahil etme
-            //var sales = db.Sales_by_Year(new DateTime(1997, 1, 1),DateTime.Now);
-            //foreach (var sale in sales)
-            //{
-            //    Console.WriteLine(sale.Year + "/" + sale.Subtotal);
-            //}
-            //Console.ReadLine();
-
-            //var products = db.Ten_Most_Expensive_Products();
-            //foreach(var pro in products)
-            //{
-            //    Console.WriteLine(pro.TenMostExpensiveProducts + "/" + pro.UnitPrice);
-            //}
-            //Console.ReadLine();
-
-            //var categories = db.Categories;
-
-            //foreach (var cat in categories)
-            //{
-            //    Console.WriteLine(cat.CategoryName);
-            //}
 
         }
     }
