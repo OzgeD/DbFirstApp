@@ -13,15 +13,14 @@ namespace DbFirstApp
         static void Main(string[] args)
         {
             NORTHWNDEntities db = new NORTHWNDEntities();
-            //Immediate Mode vs Defered Mode
-            //Immediate'da kodun çağrılmasıyla beraber sql profiler'a sorgu gidiyor
-            //var categories = db.Categories.ToList(); //Immediate Mode
-
-            //Defered Mode'da ise kodun çağrılmasıyla sql profiler'a sorgu gitmiyor,
-            //categories'e ihtiyaç duyulup kullanıldığında sql profiler'a sorgu gidiyor.
-            var categories = db.Categories; //Defered Mode
-            categories.Count();
-
+            //Lazy Loading and Navigation Properties
+            var category = db.Categories.Find(1);
+            var products = category.Products;
+            foreach (var product in products)
+            {
+                Console.WriteLine(product.ProductName);
+                Console.WriteLine("Supplier:" + product.Supplier.CompanyName);
+            }
             Console.ReadLine();
         }
     }
