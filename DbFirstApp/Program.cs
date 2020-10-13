@@ -15,12 +15,16 @@ namespace DbFirstApp
             NORTHWNDEntities db = new NORTHWNDEntities();
             //Lazy Loading and Navigation Properties
             var category = db.Categories.Find(1);
+            //1 sorgu döndü.
             var products = category.Products;
             foreach (var product in products)
             {
                 Console.WriteLine(product.ProductName);
                 Console.WriteLine("Supplier:" + product.Supplier.CompanyName);
+                //1000 ürün varsa 1000 sorgu döner
             }
+            //Toplamda 1001 sorgu dönmüş oldu.
+            //"N+1" problem olarakta geçer. 
             Console.ReadLine();
         }
     }
