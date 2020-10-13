@@ -13,19 +13,17 @@ namespace DbFirstApp
         static void Main(string[] args)
         {
             NORTHWNDEntities db = new NORTHWNDEntities();
-            //Lazy Loading and Navigation Properties
-            var category = db.Categories.Find(1);
-            //1 sorgu döndü.
+            //Eager Loading
+            var category = db.Categories.Include("Products").Include("Products.Supplier").FirstOrDefault(x => x.CategoryID == 1);
             var products = category.Products;
             foreach (var product in products)
             {
                 Console.WriteLine(product.ProductName);
-                Console.WriteLine("Supplier:" + product.Supplier.CompanyName);
-                //1000 ürün varsa 1000 sorgu döner
+                Console.WriteLine(product.Supplier.CompanyName);
             }
-            //Toplamda 1001 sorgu dönmüş oldu.
-            //"N+1" problem olarakta geçer. 
             Console.ReadLine();
+            //Single query occurred in sql profiler.
+
         }
     }
 }
